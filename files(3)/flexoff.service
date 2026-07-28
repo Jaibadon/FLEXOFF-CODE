@@ -1,0 +1,40 @@
+# =============================================================================
+# Flex-Off kiosk service  (systemd USER service)
+#
+# Install:  ~/.config/systemd/user/flexoff.service
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now flexoff
+#
+# A *user* service is used rather than a system one because the game needs the
+# graphical session that belongs to this user. It starts after the desktop is
+# up, which is what makes it work on both X11 (Bullseye) and Wayland (Bookworm).
+# =============================================================================
+[Unit]
+Description=Flex-Off EMG Arcade Cabinet
+# Wait for the graphical session, otherwise raylib has no display to open on.
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/flexoff/kiosk/start-flexoff.sh
+WorkingDirectory=%h/flexoff
+
+# The whole point: if it dies, it comes back. RestartSec is short so a judge
+# sees a blink rather than a black screen.
+Restart=always
+RestartSec=2
+
+# Don't let a crash loop trip systemd's rate limiter and give up permanently -
+# for a demo, "keep trying forever" is the correct behaviour.
+StartLimitIntervalSec=0
+
+# Unbuffered so the log is useful the moment something goes wrong, rather than
+# holding the last few lines hostage in a buffer after a crash.
+Environment=PYTHONUNBUFFERED=1
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=graphical-session.target

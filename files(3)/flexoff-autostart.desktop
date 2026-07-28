@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Flex-Off
+Comment=EMG Arcade Cabinet
+Exec=/home/pi/flexoff/kiosk/start-flexoff.sh
+Terminal=false
+X-GNOME-Autostart-enabled=true
